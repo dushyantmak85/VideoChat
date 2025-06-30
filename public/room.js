@@ -1,5 +1,5 @@
 const socket= io('/');
-const videoGrid=document.getElementById('video-grid');
+const videoGrid=document.getElementById('videoGrid');
 const myPeer=new Peer(undefined, {
     host: '/',
     port: 3001
@@ -25,7 +25,8 @@ socket.on('user-connected',(userId)=>{
 
 function addVideoStream(video,stream){
     video.srcObject=stream;
-    video.addEventListener('Loadedmetadata',()=>{
+       video.style.transform = 'scaleX(-1)'; 
+    video.addEventListener('loadedmetadata',()=>{
         video.play();
     })
     videoGrid.append(video);
