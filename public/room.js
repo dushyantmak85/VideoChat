@@ -13,9 +13,18 @@ navigator.mediaDevices.getUserMedia({
     audio: true
 }).then(stream => {
     addVideoStream(myVideo, stream);
+    myPeer.on('call', call => {
+        call.answer(stream);
+        const video = document.createElement('video');
+        call.on('stream', userVideoStream => {
+            addVideoStream(video, userVideoStream);
+            console.log("Received remote stream from incoming call");
+        });
+    });
 
     socket.on('user-connected', (userId) => {
         connectToNewUser(userId, stream);
+        console.log("User connected: " + userId);
     });
 })
 
@@ -33,11 +42,15 @@ function addVideoStream(video, stream) {
     videoGrid.append(video);
 }
 
-function connectToNewUser(userId,stream){
-    const call= myPeer.call(userId,stream);
-    const video=document.createElement('video');
-    call.on('stream',userVideoStream=>{
-        addVideoStream(video,userVideoStream);
+function connectToNewUser(userId, stream) {
+    const call = myPeer.call(userId, stream);
+    const video = document.createElement('video');
+    call.on('stream', userVideoStream => {
+        addVideoStream(video, userVideoStream);
+        console.log("Received remote stream");
     })
-    
+
+    call.on('close', () => {
+        video.remove();
+    })
 }
